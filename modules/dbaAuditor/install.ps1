@@ -15,13 +15,13 @@ function Write-LocalMessage {
 }
 
 try {
-    if (Get-InstalledModule sqlauditors -Erroraction Stop) {
-        Update-Module sqlauditors -Erroraction Stop
+    if (Get-InstalledModule dbauditor -Erroraction Stop) {
+        Update-Module dbauditor -Erroraction Stop
         Write-LocalMessage -Message "Updated using the PowerShell Gallery"
         return
     }
 } catch {
-    Write-LocalMessage -Message "sqlauditors was not installed by the PowerShell Gallery, continuing with web install."
+    Write-LocalMessage -Message "dbauditor was not installed by the PowerShell Gallery, continuing with web install."
 }
 
 $currentVersionTls = [Net.ServicePointManager]::SecurityProtocol
@@ -33,7 +33,7 @@ $availableTls | ForEach-Object {
     [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor $_
 }
 
-$sqlauditors_copydllmode = $true
+$dbauditor_copydllmode = $true
 
 foreach ($modpath in $($env:PSModulePath -split [IO.Path]::PathSeparator)) {
     #Grab the user's default home directory module path for later
@@ -41,7 +41,7 @@ foreach ($modpath in $($env:PSModulePath -split [IO.Path]::PathSeparator)) {
         $userpath = $modpath
     }
     try {
-        $temppath = Join-Path -Path $modpath -ChildPath "sqlauditors"
+        $temppath = Join-Path -Path $modpath -ChildPath "dbauditor"
         $localpath = (Get-ChildItem $temppath -ErrorAction Stop).FullName
     } catch {
         $localpath = $null
@@ -49,9 +49,9 @@ foreach ($modpath in $($env:PSModulePath -split [IO.Path]::PathSeparator)) {
 }
 
 if ($null -eq $localpath) {
-    # In case sqlauditors is not currently installed in any PSModulePath put it in the $userpath
+    # In case dbauditor is not currently installed in any PSModulePath put it in the $userpath
     if (Test-Path -Path $userpath) {
-        $localpath = Join-Path -Path $userpath -ChildPath "sqlauditors"
+        $localpath = Join-Path -Path $userpath -ChildPath "dbauditor"
     }
 } else {
     Write-LocalMessage -Message "Updating current install"
@@ -77,18 +77,18 @@ if (-not $path -or (Test-Path -Path "$path\.git")) {
     $path = $localpath
 }
 
-If ($lib = [appdomain]::CurrentDomain.GetAssemblies() | Where-Object FullName -like "sqlauditors, *") {
+If ($lib = [appdomain]::CurrentDomain.GetAssemblies() | Where-Object FullName -like "dbauditor, *") {
     $wildcardpath = Join-Path -Path $Path -ChildPath *
     if ($lib.Location -like "$wildcardpath") {
         Write-LocalMessage @"
-We have detected sqlauditors to be already imported from
+We have detected dbauditor to be already imported from
 $path
 In a manner that prevents us from updating it, since dll files have been locked.
 In order to ensure a valid update, please:
-- Close all consoles that have sqlauditors imported (Remove-Module sqlauditors is NOT enough)
+- Close all consoles that have dbauditor imported (Remove-Module dbauditor is NOT enough)
 - Start a new PowerShell console
-- Run '`$sqlauditors_copydllmode = `$true' (without the single-quotes)
-- Import sqlauditors and run Update-sqlauditors
+- Run '`$dbauditor_copydllmode = `$true' (without the single-quotes)
+- Import dbauditor and run Update-dbauditor
 If done in this order, the binaries will be copied to another location before import, allowing for a save update.
 "@
         return
@@ -107,15 +107,15 @@ if (!(Test-Path -Path $path)) {
 }
 
 if ($beta) {
-    $url = 'https://sqlauditors.io/devzip'
+    $url = 'https://dbauditor.io/devzip'
     $branch = "development"
 } else {
-    $url = 'https://sqlauditors.io/zip'
+    $url = 'https://dbauditor.io/zip'
     $branch = "master"
 }
 
 $temp = ([System.IO.Path]::GetTempPath())
-$zipfile = Join-Path -Path $temp -ChildPath "sqlauditors.zip"
+$zipfile = Join-Path -Path $temp -ChildPath "dbauditor.zip"
 
 Write-LocalMessage -Message "Downloading archive from github"
 try {
@@ -142,8 +142,8 @@ if (($PSVersionTable.PSVersion.Major -lt 6) -or ($PSVersionTable.Platform -and $
 Write-LocalMessage -Message "Unzipping"
 
 
-$branchpath = Join-Path -Path $temp -ChildPath "sqlauditors-$branch"
-$oldpath = Join-Path -Path $temp -ChildPath "sqlauditors-old"
+$branchpath = Join-Path -Path $temp -ChildPath "dbauditor-$branch"
+$oldpath = Join-Path -Path $temp -ChildPath "dbauditor-old"
 $wildcardoldpath = Join-Path -Path $oldpath -ChildPath *
 $wildcardbranchpath = Join-Path -Path $branchpath -ChildPath *
 
@@ -174,8 +174,8 @@ This usually has one of two causes:
 - Insufficient privileges (need to run as admin)
 - A file is locked - generally a dll file from having the module imported in some process.
 
-You can run the following line before importing sqlauditors to prevent file locking:
-`$sqlauditors_copydllmode = `$true
+You can run the following line before importing dbauditor to prevent file locking:
+`$dbauditor_copydllmode = `$true
 But it increases the time needed to import the module, so we only recommend using it for updates.
 
 Exception:
@@ -191,19 +191,19 @@ Remove-Item -Path $branchpath -Recurse -Force
 Remove-Item $oldpath -Recurse -Force
 Remove-Item -Path $zipfile -Recurse -Force
 
-Write-LocalMessage -Message "Done! Please report any bugs to sqlauditors.io/issues"
-if (Get-Module sqlauditors) {
+Write-LocalMessage -Message "Done! Please report any bugs to dbauditor.io/issues"
+if (Get-Module dbauditor) {
     Write-LocalMessage -Message @"
 
-Please restart PowerShell before working with sqlauditors.
+Please restart PowerShell before working with dbauditor.
 "@
 } else {
-    $psd1 = Join-Path -Path $path -ChildPath "sqlauditors.psd1"
+    $psd1 = Join-Path -Path $path -ChildPath "dbauditor.psd1"
     Import-Module $psd1 -Force
     Write-LocalMessage @"
 
-sqlauditors v $((Get-Module sqlauditors).Version)
-# Commands available: $((Get-Command -Module sqlauditors -CommandType Function | Measure-Object).Count)
+dbauditor v $((Get-Module dbauditor).Version)
+# Commands available: $((Get-Command -Module dbauditor -CommandType Function | Measure-Object).Count)
 
 "@
 }

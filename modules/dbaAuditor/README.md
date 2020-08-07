@@ -1,17 +1,17 @@
-# SQLAuditor
+# dbAuditor
 SQL database automated auditing tool
 
-SQLAuditor is a PowerShell module developed by IT Auditors. SQL Auditor can be comparable or you may think of like a command-line SQL Server Management Studio. It has a collection of commands that help automate SQL Server Auditing tasks and exports into workable excel reports.
+dbAuditor is a PowerShell module developed by IT Auditors. DB Auditor can be comparable or you may think of like a command-line SQL Server Management Studio. It has a collection of commands that help automate SQL Server Auditing tasks and exports into workable excel reports.
 
 
 ## Installer
 
-SQL Auditor works on PowerShell Core (aka PowerShell 6+). This means that you can run a large majority of our commands on <strong>Linux</strong> and <strong>macOS </strong>
+DB Auditor works on PowerShell Core (aka PowerShell 6+). This means that you can run a large majority of our commands on <strong>Linux</strong> and <strong>macOS </strong>
 
-Run the following to install sqlauditor from the PowerShell Gallery (to install on a server or for all users, remove the `-Scope` parameter and run in an elevated session):
+Run the following to install dbAuditor from the PowerShell Gallery (to install on a server or for all users, remove the `-Scope` parameter and run in an elevated session):
 
 ```powershell
-Install-Module sqlauditor -Scope CurrentUser
+Install-Module dbAuditor -Scope CurrentUser
 ```
 
 If you don't have a version of PowerShell that supports the PowerShell Gallery, you can install it manually:
@@ -41,7 +41,7 @@ $allservers = $old, $new
 $allservers = Get-DbaCmsRegServer -SqlInstance $instance
 
 # Testing your backups
-Start-Process https://sqlauditor.io/Test-DbaLastBackup
+Start-Process https://dbAuditor.io/Test-DbaLastBackup
 Test-DbaLastBackup -SqlInstance $old | Out-GridView
 
 # But what if you want to test your backups on a different server?
@@ -88,7 +88,7 @@ Invoke-Item $home
 Get-DbaSchemaChangeHistory -SqlInstance $new -Database tempdb
 
 # History
-Get-Command -Module sqlauditor *history*
+Get-Command -Module dbAuditor *history*
 
 # Identity usage
 Test-DbaIdentityUsage -SqlInstance $instance | Out-GridView
@@ -150,7 +150,7 @@ Note that PowerShell sees commas as arrays, so you must surround the host name w
 #### Using Start-Transcript
 
 ```powershell
-Import-Module sqlauditor
+Import-Module dbAuditor
 Start-Transcript
 Get-DbaDatabase -SqlInstance sql2017
 Stop-Transcript
